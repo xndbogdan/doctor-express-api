@@ -31,9 +31,8 @@ class SlotsController {
     res: Response
   ): Promise<void> => {
     try {
-      const { doctorId } = req.params;
-      const doctorIdInt = parseInt(doctorId);
-      const doctorResult = await findDoctorById(doctorIdInt);
+      const doctorId = parseInt(req.params.doctorId);
+      const doctorResult = await findDoctorById(doctorId);
 
       if (!doctorResult.success) {
         res.status(doctorResult.error!.status).json({
@@ -57,7 +56,7 @@ class SlotsController {
 
       // Try to get slots from cache first
       const cachedSlots = await availableSlotsCache.get(
-        doctorIdInt,
+        doctorId,
         dateString
       );
 
@@ -78,7 +77,7 @@ class SlotsController {
       // 1. Get all active recurring patterns for this doctor
       const patterns = await prisma.recurringPattern.findMany({
         where: {
-          doctorId: doctorIdInt,
+          doctorId: doctorId,
           is_active: true,
           // Only get patterns that apply to this date
           OR: [
@@ -117,7 +116,7 @@ class SlotsController {
        // Get all booked slots for this date range
       const bookedSlots = await prisma.slot.findMany({
         where: {
-          doctorId: doctorIdInt,
+          doctorId: doctorId,
           status: "booked",
           start_time: {
             gte: startOfDay.toJSDate(),
@@ -159,7 +158,7 @@ class SlotsController {
       });
 
       // Cache the available slots
-      await availableSlotsCache.set(doctorIdInt, dateString, availableSlots);
+      await availableSlotsCache.set(doctorId, dateString, availableSlots);
 
       res.status(200).json({
         data: availableSlots,
@@ -178,7 +177,7 @@ class SlotsController {
     res: Response
   ): Promise<void> => {
     try {
-      const { doctorId } = req.params;
+      const doctorId = parseInt(req.params.doctorId);
       const doctorResult = await findDoctorById(doctorId);
 
       if (!doctorResult.success) {
@@ -210,7 +209,7 @@ class SlotsController {
       // Create the recurring pattern
       const pattern = await prisma.recurringPattern.create({
         data: {
-          doctorId: parseInt(doctorId),
+          doctorId: doctorId,
           start_time: startTime.toJSDate(),
           end_time: endTime.toJSDate(),
           duration,
@@ -224,7 +223,7 @@ class SlotsController {
       });
 
       // Invalidate all caches for this doctor
-      await availableSlotsCache.invalidateAll(parseInt(doctorId));
+      await availableSlotsCache.invalidateAll(doctorId);
 
       res.status(201).json({
         message: "Recurring pattern created successfully",
