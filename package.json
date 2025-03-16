@@ -5,12 +5,28 @@
   "main": "/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts src/queue.ts --format cjs,esm --dts ",
+    "prisma:generate": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@types/express-serve-static-core": "^5.0.6",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.5.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.4.0",
+    "tsx": "4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-transform-paths": "^3.5.5"
   }
 }
