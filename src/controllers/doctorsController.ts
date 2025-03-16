@@ -3,12 +3,6 @@ import { createDoctorValidator } from "@/validators/doctor";
 import { errors } from "@vinejs/vine";
 import prisma from "@/lib/prisma";
 
-interface RecurrencePattern {
-  type: "daily" | "weekly" | "one-time";
-  end_date?: string;
-  week_days?: number[]; // 0 = Sunday, 1 = Monday, etc.
-}
-
 class DoctorsController {
   public index: RequestHandler = async (
     _req: Request,
