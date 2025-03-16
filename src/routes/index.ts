@@ -8,5 +8,7 @@ const router = Router();
 router.get("/doctors", DoctorsController.index);
 router.post("/doctors", DoctorsController.store);
 
-router.post("/doctors/:doctorId/slots", SlotsController.createSlots);
+router.get("/doctors/:doctorId/slots", SlotsController.index);
+router.post("/doctors/:doctorId/slots", SlotsController.store);
+
 export default router;
