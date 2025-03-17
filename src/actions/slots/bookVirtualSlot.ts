@@ -33,7 +33,6 @@ export const bookVirtualSlot = async (
 
   try {
     // Parse the pattern ID and start time
-    console.log(slotId);
     const [patternIdStr, startTimeIso] = slotId.split(/-(.*)/s)
     const patternId = parseInt(patternIdStr);
 
@@ -51,11 +50,7 @@ export const bookVirtualSlot = async (
         },
       };
     }
-    console.log({
-      patternIdStr,
-      patternId,
-      startTimeIso,
-    })
+
     // Parse the start time
     const startTime = DateTime.fromISO(startTimeIso);
     if (!startTime.isValid) {
@@ -67,8 +62,6 @@ export const bookVirtualSlot = async (
         },
       };
     }
-
-    console.log("Booking virtual slot:", patternId, startTime.toISO());
 
     // Calculate end time based on pattern duration
     const endTime = startTime.plus({ minutes: pattern.duration });
