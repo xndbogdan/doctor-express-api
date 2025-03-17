@@ -17,8 +17,7 @@ router.get("/doctors/:doctorId/patterns", PatternsController.index);
 router.patch("/doctors/:doctorId/patterns/:patternId", PatternsController.update);
 router.delete("/doctors/:doctorId/patterns/:patternId", PatternsController.destroy);
 
-// Slot booking route
-router.post("/slots/:slotId/book", DoctorsController.bookSlot);
+router.post("/slots/:slotId/book", SlotsController.bookSlot);
 
 router.get("/patients", PatientsController.index);
 router.post("/patients", PatientsController.store);

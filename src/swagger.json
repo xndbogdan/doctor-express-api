@@ -1,0 +1,1043 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Doctor Appointment API",
+    "version": "1.0.0",
+    "description": "A comprehensive RESTful API for managing doctor appointments with support for recurring appointment slots and patient bookings.",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "API Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Doctors",
+      "description": "Doctor management endpoints"
+    },
+    {
+      "name": "Patients",
+      "description": "Patient management endpoints"
+    },
+    {
+      "name": "Slots",
+      "description": "Appointment slot management"
+    },
+    {
+      "name": "Bookings",
+      "description": "Booking management endpoints"
+    },
+    {
+      "name": "Patterns",
+      "description": "Recurrence pattern management"
+    }
+  ],
+  "paths": {
+    "/doctors": {
+      "get": {
+        "tags": ["Doctors"],
+        "summary": "Get all doctors",
+        "responses": {
+          "200": {
+            "description": "List of all doctors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Doctor"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Doctors"],
+        "summary": "Create a new doctor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoctorInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Doctor created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Doctor created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Doctor"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}/slots": {
+      "post": {
+        "tags": ["Slots"],
+        "summary": "Create slots for a doctor",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlotInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recurring pattern created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Recurring pattern created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringPattern"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Slots"],
+        "summary": "Get all available slots for a doctor on a specific date",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-03-15"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available slots",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Slot"
+                      }
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": ["cache", "generated"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date parameter"
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}/bookings": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get all bookings for a doctor within a date range",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2025-03-15T00:00:00Z"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2025-03-15T23:59:59Z"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Booking"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date parameters"
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}/appointments/{date}": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get all appointments for a doctor on a specific date",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-03-15"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of appointments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Booking"
+                      }
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": ["cache", "generated"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date parameter"
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}/patterns": {
+      "get": {
+        "tags": ["Patterns"],
+        "summary": "Get all recurring patterns for a doctor",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recurring patterns",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RecurringPattern"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/doctors/{doctorId}/patterns/{patternId}": {
+      "patch": {
+        "tags": ["Patterns"],
+        "summary": "Update a recurring pattern's active status",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "patternId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["is_active"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pattern updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Pattern activated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringPattern"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid is_active value"
+          },
+          "404": {
+            "description": "Pattern not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Patterns"],
+        "summary": "Delete a recurring pattern",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "patternId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pattern deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Pattern deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pattern not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/slots/{slotId}/book": {
+      "post": {
+        "tags": ["Bookings"],
+        "summary": "Book a slot",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the slot to book (can be a real slot ID or a virtual slot ID with pattern)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Slot booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Slot booked successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Slot not found"
+          },
+          "409": {
+            "description": "Slot already booked"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/patients": {
+      "get": {
+        "tags": ["Patients"],
+        "summary": "Get all patients",
+        "responses": {
+          "200": {
+            "description": "List of all patients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Patient"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Patients"],
+        "summary": "Create a new patient",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Patient created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Patient created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Patient"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/patients/{patientId}": {
+      "get": {
+        "tags": ["Patients"],
+        "summary": "Get a patient by ID",
+        "parameters": [
+          {
+            "name": "patientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Patient details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PatientWithBookings"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Patients"],
+        "summary": "Update a patient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patient updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Patient updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Patient"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Patients"],
+        "summary": "Delete a patient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Patient deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Patient deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot delete patient with bookings"
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Doctor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DoctorInput": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": ["username", "first_name", "last_name", "email"]
+      },
+      "Patient": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PatientWithBookings": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Patient" },
+          {
+            "type": "object",
+            "properties": {
+              "bookings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PatientInput": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": ["first_name", "last_name", "email"]
+      },
+      "Slot": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "doctorId": {
+            "type": "integer"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["available", "booked"]
+          },
+          "patternId": {
+            "type": "integer"
+          }
+        }
+      },
+      "SlotInput": {
+        "type": "object",
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer",
+            "enum": [15, 30]
+          },
+          "recurrence": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["daily", "weekly", "one-time"]
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "week_days": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6
+                }
+              }
+            },
+            "required": ["type"]
+          }
+        },
+        "required": ["start_time", "end_time", "duration", "recurrence"]
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "slotId": {
+            "type": "integer"
+          },
+          "patientId": {
+            "type": "integer"
+          },
+          "doctorId": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/Patient"
+          },
+          "slot": {
+            "$ref": "#/components/schemas/Slot"
+          }
+        }
+      },
+      "BookingInput": {
+        "type": "object",
+        "properties": {
+          "patientId": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": ["patientId"]
+      },
+      "RecurringPattern": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "doctor_id": {
+            "type": "integer"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["daily", "weekly", "one-time"]
+          },
+          "week_days": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
