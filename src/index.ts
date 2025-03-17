@@ -1,5 +1,9 @@
 import express, { Application, Request, Response } from "express";
 import routes from "@/routes";
+import cors from "cors";
+import 'dotenv/config';
+import { DateTime, Settings } from "luxon";
+import { appConfig } from "./config";
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
@@ -7,7 +11,11 @@ const swaggerDocument = require("./swagger.json");
 const app: Application = express();
 const PORT: number = 3000;
 
+Settings.defaultZone = appConfig.TZ;
+console.info(`Application timezone set to ${DateTime.local().zoneName}`);
+
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

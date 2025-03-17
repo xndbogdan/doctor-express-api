@@ -143,3 +143,15 @@ If time permits:
 - API Example: `GET /doctors/{doctorId}/available_slots?date=2014-12-25`
 - Required parameters: date
 - Expected Result: Returns a list of available slots for the specified date
+
+## Data Models
+
+### RecurringPattern
+- **week_days**: For weekly patterns, specifies which days of the week the pattern applies to. Uses numbers 1-7 where:
+  - 1 = Monday
+  - 2 = Tuesday
+  - 3 = Wednesday
+  - 4 = Thursday
+  - 5 = Friday
+  - 6 = Saturday
+  - 7 = Sunday

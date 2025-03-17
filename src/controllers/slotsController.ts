@@ -20,7 +20,7 @@ import bookRealSlot from "@/actions/slots/bookRealSlot";
 interface RecurrencePattern {
   type: "daily" | "weekly" | "one-time";
   end_date?: string;
-  week_days?: number[]; // 0 = Sunday, 1 = Monday, etc.
+  week_days?: number[]; // 1 = Monday, 2 = Tuesday, ..., 7 = Sunday
 }
 
 interface availableSlot {
@@ -56,6 +56,16 @@ class SlotsController {
 
       const queryDate = dateResult.date!;
       const dateString = queryDate.toFormat("yyyy-MM-dd");
+
+      // ^ check if query date is in the past or today, and return empty slots if so
+      const now = DateTime.now();
+      if (queryDate < now.endOf("day")) {
+        res.status(200).json({
+          data: [],
+          source: "empty",
+        });
+        return;
+      }
 
       // Try to get slots from cache first
       const cachedSlots = await availableSlotsCache.get(
@@ -115,7 +125,7 @@ class SlotsController {
           ],
         },
       });
-
+      
        // Get all booked slots for this date range
       const bookedSlots = await prisma.slot.findMany({
         where: {
@@ -141,7 +151,6 @@ class SlotsController {
         }
       });
 
-      const dayOfWeek = startOfDay.weekday - 1;
       let availableSlots: availableSlot[] = [];
 
       for (const pattern of patterns) {
@@ -149,7 +158,7 @@ class SlotsController {
           pattern,
           startOfDay,
           bookedSlotMap,
-          dayOfWeek,
+          dayOfWeek: startOfDay.weekday, // Luxon's DateTime.weekday already uses 1-7 (Mon-Sun)
         });
 
         availableSlots = [...availableSlots, ...slots];

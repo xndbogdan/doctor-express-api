@@ -938,8 +938,9 @@
                 "type": "array",
                 "items": {
                   "type": "integer",
-                  "minimum": 0,
-                  "maximum": 6
+                  "minimum": 1,
+                  "maximum": 7,
+                  "description": "Day of week: 1-Monday through 7-Sunday"
                 }
               }
             },
@@ -1021,7 +1022,10 @@
           "week_days": {
             "type": "array",
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7,
+              "description": "Day of week: 1-Monday through 7-Sunday"
             }
           },
           "start_date": {

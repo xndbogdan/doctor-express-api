@@ -12,7 +12,7 @@ interface SlotGeneration {
  * @param pattern The recurring pattern to generate slots from
  * @param startOfDay The start of the day as a DateTime object
  * @param bookedSlotMap A map of booked slots by ISO time string
- * @param dayOfWeek The day of week (0-6, 0 is Sunday)
+ * @param dayOfWeek The day of week (1-7, where 1 is Monday and 7 is Sunday)
  * @returns Array of available slot objects
  */
 export const generateSlotsFromPattern = ({
@@ -28,8 +28,14 @@ export const generateSlotsFromPattern = ({
 
   // Skip weekly patterns that don't apply to this day of the week
   if (pattern.type === "weekly" && !pattern.week_days.includes(dayOfWeek)) {
+    console.log({
+      weekDays: pattern.week_days,
+      dayOfWeek,
+      startOfDay
+    })
     return [];
   }
+  console.log(dayOfWeek);
 
   const availableSlots = [];
 

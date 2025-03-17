@@ -63,7 +63,6 @@ CREATE TABLE "Booking" (
     "patientId" INTEGER NOT NULL,
     "doctorId" INTEGER NOT NULL,
     "reason" TEXT,
-    "booking_time" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 

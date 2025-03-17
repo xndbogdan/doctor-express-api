@@ -1,6 +1,7 @@
 // Application configuration
 export const appConfig = {
   // Add any application-specific configuration here if needed
+  TZ: process.env.TZ || "UTC",
 };
 
 // Redis cache configuration
