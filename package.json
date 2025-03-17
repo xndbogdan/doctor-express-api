@@ -7,8 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts src/queue.ts --format cjs,esm --dts ",
-    "prisma:generate": "prisma generate"
+    "build": "tsup src/index.ts --format cjs,esm --dts ",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
   },
   "keywords": [],
   "author": "",
