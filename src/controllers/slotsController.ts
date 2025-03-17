@@ -13,6 +13,9 @@ import {
   availableSlotsCache,
 } from "@/services/cacheService";
 import generateSlotsFromPattern from "@/actions/slots/generateSlotsFromPattern";
+import { createBookingValidator } from "@/validators/booking";
+import bookVirtualSlot from "@/actions/slots/bookVirtualSlot";
+import bookRealSlot from "@/actions/slots/bookRealSlot";
 
 interface RecurrencePattern {
   type: "daily" | "weekly" | "one-time";
@@ -249,6 +252,46 @@ class SlotsController {
       console.error("Error creating slots:", error);
       res.status(500).json({
         message: "An error occurred while creating slots",
+      });
+    }
+  };
+
+  public bookSlot: RequestHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const { slotId } = req.params;
+      const data = await createBookingValidator.validate(req.body);
+
+      let result;
+      // Check if this is a virtual slot ID (pattern-based)
+      if (slotId.includes("-")) {
+        result = await bookVirtualSlot(slotId, data);
+      } else {
+        result = await bookRealSlot(parseInt(slotId), data);
+      }
+
+      if (!result.success && result.error) {
+        res.status(result.error.status).json({
+          message: result.error.message,
+        });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Slot booked successfully",
+        data: result.data,
+      });
+    } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        res.status(400).json({ errors: error.messages });
+        return;
+      }
+
+      console.error("Error booking slot:", error);
+      res.status(500).json({
+        message: "An error occurred while booking the slot",
       });
     }
   };
