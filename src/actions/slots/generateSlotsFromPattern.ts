@@ -28,14 +28,8 @@ export const generateSlotsFromPattern = ({
 
   // Skip weekly patterns that don't apply to this day of the week
   if (pattern.type === "weekly" && !pattern.week_days.includes(dayOfWeek)) {
-    console.log({
-      weekDays: pattern.week_days,
-      dayOfWeek,
-      startOfDay
-    })
     return [];
   }
-  console.log(dayOfWeek);
 
   const availableSlots = [];
 
